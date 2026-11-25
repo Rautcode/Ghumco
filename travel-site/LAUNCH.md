@@ -58,6 +58,20 @@ python3 tools/prep_media.py clip my-clip.mp4 temple --start 3 --dur 6 # makes vi
 Both re-encode the file, so camera and GPS data are removed, and clips lose their sound and stay under 8 seconds and a small size
 (the home page loads about 0.5 MB before anyone scrolls; each clip only downloads when it scrolls into view). Use only media you own, and only people who have said yes.
 
+## Group departures board (optional, hidden until you add one)
+When you have a real group trip, add it to `brand.json` and rebuild. The "Join a group trip" section appears below the photo reel; with no departures it does not exist on the page.
+```
+"departures": [{
+  "route": "Konkan coast: Diveagar and Harihareshwar", "dates": "12-14 Dec", "from": "Pune (Wakad, Swargate)",
+  "seats_total": 12, "seats_booked": 3, "price_inr": 3499,
+  "includes": "Tempo Traveller, stay, breakfast, trip leader",
+  "go_no_go": "Runs at 12+ travellers; decided 5 Dec",
+  "refund_rule": "If we do not reach 12 by 5 Dec you get a full refund or a seat on the next date.",
+  "confirmed": true }]
+```
+The build refuses an entry without `"confirmed": true` (list a trip only when the vehicle, stays and leader are really arranged), without a refund rule, or with
+impossible seat counts. `price_inr` is optional: leave it out and the card shows no price. Update `seats_booked` from your real bookings and rebuild; never round it up.
+
 ## What the site does and does not offer today
 - **Blueprint PDFs are sold for Rajasthan and Kerala only**, because those are the routes with a finished, real plan. To sell another route: add it to
   `BLUEPRINTS` in `travel-backend/app/services/rag_loader.py`, upload its PDF to the `blueprints` bucket, add it to `BP_ID` and give its card a

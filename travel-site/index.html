@@ -152,17 +152,22 @@ svg.i{width:1.2em;height:1.2em;fill:none;stroke:currentColor;stroke-width:2;stro
 .proof{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:18px;font:500 .78rem var(--mono);letter-spacing:.04em;color:var(--forest)}.proof b{color:var(--terra-d)}
 
 @media(max-width:900px){
-  .hero-in{grid-template-columns:1fr;padding:132px 0 clamp(110px,24vw,150px);gap:18px}
-  .hero-photos{min-height:300px;max-width:440px;width:100%;margin:0 auto}
-  .hpic{width:min(210px,54%)}.hpic.a{top:0}.hpic.b{top:60px}.hpic.c{display:none}
+  .hero-in{grid-template-columns:1fr;padding:132px 0 clamp(110px,24vw,150px);gap:0}
+  /* the copy's children join the hero grid so the photos can sit between the subhead and the buttons: a photo is on the first phone screen */
+  .hero-copy{display:contents}.hero-copy>*{order:5}.stamp-line{order:1;justify-self:start}.hero h1{order:2}.hero p.sub{order:3}
+  .hero-photos{order:4;min-height:230px;max-width:360px;width:100%;margin:14px auto 6px}
+  .hpic{width:min(170px,50%);padding:8px 8px 11px}.hpic figcaption{font-size:1rem}.hpic.a{top:0;left:0}.hpic.b{top:34px}.hpic.c{display:none}
+  .cta-row{margin-top:14px}
 }
+/* group departures (hidden unless brand.json has real ones) */
+.deps{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px;margin-top:26px}
+.dep{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 14px 28px -20px rgba(31,36,33,.5);display:flex;flex-direction:column;gap:10px}
+.dep h3{font-size:1.25rem}.dep .when{font:500 .8rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--terra-d)}
+.dep dl{margin:4px 0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.92rem}.dep dt{color:var(--muted)}.dep dd{margin:0;font-weight:600}
+.seats{height:8px;border-radius:99px;background:var(--paper-2);overflow:hidden}.seats i{display:block;height:100%;background:var(--forest-2)}
+.dep .rule{font-size:.86rem;color:var(--muted);border-left:3px solid var(--gold);padding-left:10px}
+.dep .btn{margin-top:auto;align-self:flex-start}
 /* trust strip */
-.strip{padding:0;margin-top:-1px;background:var(--forest);color:#F5EEE1}
-.strip ul{list-style:none;padding:20px 0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px 22px}
-.strip li{display:flex;gap:12px;align-items:center;font-size:.92rem;font-weight:600;line-height:1.3}
-.strip .i{color:var(--gold);width:1.7em;height:1.7em}
-@media(max-width:860px){.strip ul{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.strip ul{grid-template-columns:1fr}}
 
 /* founder / field notes */
 .notes{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center}
@@ -590,29 +595,14 @@ dialog::backdrop{background:rgba(10,20,15,.68)}
   <div class="wrap ig reveal"><span class="hand">See more on Instagram →</span><a class="btn btn-ghost" id="ig" target="_blank" rel="noopener"><svg class="i"><use href="#i-insta"/></svg>@[INSTAGRAM_HANDLE]</a></div>
 </section>
 
-<section class="strip" aria-label="Why trust us">
-  <div class="wrap"><ul>
-    <li><svg class="i"><use href="#i-shield"/></svg>Rajasthan &amp; Kerala plans from real trips</li>
-    <li><svg class="i"><use href="#i-train"/></svg>Exact train, flight &amp; road timings</li>
-    <li><svg class="i"><use href="#i-clock"/></svg>24-hour custom quote turnaround</li>
-    <li><svg class="i"><use href="#i-wallet"/></svg>A written quote before you pay</li>
-  </ul></div>
-</section>
 
-<!-- ============ FOUNDER ============ -->
-<section id="about" aria-labelledby="about-h">
-  <div class="wrap notes">
-    <div class="polas reveal" aria-hidden="false">
-      <figure class="pola a"><img src="img/trip-crew-560.webp" alt="A group of travellers standing with their motorbikes on a forest road" width="560" height="476" loading="lazy" decoding="async"><figcaption>The crew, mid-ride</figcaption></figure>
-      <figure class="pola b"><img src="img/trip-sunset-560.webp" alt="People silhouetted against the sea as the sun sets" width="560" height="476" loading="lazy" decoding="async"><figcaption>Sunset at the sea's edge</figcaption></figure>
-    </div>
-    <div class="reveal">
-      <span class="kicker">Field notes</span>
-      <h2 id="about-h">Trips fall apart on small things.</h2>
-      <p class="lead">Hi, I'm [FOUNDER_NAME]. I've planned group trips for 14 or more friends across Rajasthan, Goa, Karnataka, Kerala and the Konkan coast, and now I plan trips for other travellers across India. What ruins a trip is rarely the big stuff: it's the fort that shuts at 5, the train you can't miss, the lunch spot that takes 90 minutes.</p>
-      <p class="lead">So every plan here starts with those: exact timings, hard deadlines, and a cut-list for when the day runs late. No filler, no tourist traps, no guesswork.</p>
-      <p class="hand" style="margin-top:14px">&mdash; [FOUNDER_NAME], Pune</p>
-    </div>
+
+<!-- ============ GROUP DEPARTURES (opt-in: shows only when real departures are added to brand.json) ============ -->
+<section id="departures" aria-labelledby="dep-h" hidden>
+  <div class="wrap">
+    <div class="reveal"><span class="kicker">Join a group trip</span><h2 id="dep-h">Upcoming departures</h2>
+    <p class="lead">Seats are counted for real. A trip runs only when enough travellers have joined; the go/no-go date and the refund rule are on every card.</p></div>
+    <div class="deps" id="deps"></div>
   </div>
 </section>
 
@@ -697,43 +687,33 @@ dialog::backdrop{background:rgba(10,20,15,.68)}
   </div>
 </section>
 
-<!-- ============ VERSUS ============ -->
-<section class="versus" id="how" aria-labelledby="how-h">
-  <svg class="edge" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70V30C220 64 420 8 660 34S1100 62 1440 24V70Z" fill="#EDE2CC"/></svg>
+<!-- ============ PRICING ============ -->
+<section id="services" aria-labelledby="services-h">
   <div class="wrap">
-    <div class="reveal">
-      <span class="kicker">How it works</span>
-      <h2 id="how-h">Why our itineraries are different</h2>
-      <p class="lead">What a generic Google search or a cookie-cutter package leaves out.</p>
+    <div class="reveal"><span class="kicker">Ways to work with us</span><h2 id="services-h">Get exactly the help you need.</h2></div>
+    <div class="tickets">
+      <article class="tk reveal"><div>
+        <h3>Ready-Made Proven Blueprint</h3>
+        <div class="amt">Ready PDF<small>ONE-TIME PURCHASE</small></div>
+        <ul><li>PDF sent to your WhatsApp after payment: our tested Rajasthan and Kerala routes</li><li>Exact train/flight numbers, hotel area recommendations, food master list, packing checklist</li></ul>
+        <button class="btn btn-ghost btn-block" data-plan="blueprint">Buy Ready Blueprint</button></div></article>
+      <article class="tk pop reveal"><div>
+                <h3>Custom Day-by-Day Itinerary</h3>
+        <div class="amt">Built for you<small>SHAPED BY YOUR BUDGET</small></div>
+        <ul><li>Tailored to your exact dates, departure city, group size and budget</li><li>Time-stamped daily schedule, transit connections, custom ‘EAT’ food map, priority cut-list</li><li>Delivered in 24 hours + 1 free revision</li></ul>
+        <button class="btn btn-primary btn-block" data-plan="custom">Request Custom Plan</button></div></article>
+      <article class="tk reveal"><div>
+        <h3>Full Trip Execution / Group Package</h3>
+        <div class="amt">Custom Quote<small>50% ADVANCE</small></div>
+        <ul><li>Everything in the Custom Itinerary tier</li><li>Booking of stays and Tempo Travellers/cabs for your trip. Rajasthan and Kerala first; other destinations on request</li></ul>
+        <button class="btn btn-ghost btn-block" data-plan="complete">Get Group Package Quote</button></div></article>
     </div>
-    <table class="vs reveal">
-      <thead><tr><th scope="col">The detail</th><th scope="col">Typical package</th><th scope="col">With us</th></tr></thead>
-      <tbody>
-        <tr><th scope="row">Hard deadlines &amp; cut-lists</th><td>“Fort visit” with no closing time or fallback.</td><td>Exact monument closing hours, highway buffers, and a cut-list if the group runs behind.</td></tr>
-        <tr><th scope="row">Curated ‘EAT’ food maps</th><td>Whatever restaurant the bus stops at.</td><td>Time-slotted local breakfast, street food and dinner, matched to your route.</td></tr>
-        <tr><th scope="row">Split-ready budgets</th><td>One lump sum, no breakdown.</td><td>Per-person costs for stays, Tempo Travellers, tickets and buffers, before you book anything.</td></tr>
-        <tr><th scope="row">Execution, when you want it</th><td>Take it or leave it.</td><td>Buy the PDF and book yourself, or we handle hotels and Tempo Travellers.</td></tr>
-      </tbody>
-    </table>
-    <div class="fit reveal">
-      <h3>Is this right for you?</h3>
-      <div class="fitcols">
-        <div><h4>A good fit if</h4><ul>
-          <li>You want a route that has been walked and timed, not a list of places</li>
-          <li>You're travelling solo, as a couple, with family or as a group, and want every day to run on schedule</li>
-          <li>You'd rather follow a planned route than build one from reviews</li></ul></div>
-        <div><h4>Probably not if</h4><ul>
-          <li>You want the cheapest hotel-and-bus bundle at a fixed price</li>
-          <li>You'd rather browse a catalogue and compare package deals</li>
-          <li>You don't want to follow a planned timetable</li></ul></div>
-      </div>
-      <p class="note">With the Blueprint and Custom Plan, we plan and you book. With Full Trip Execution, we book it too.</p>
-    </div>
-    <ol class="steps reveal">
-      <li><div class="n">1</div><h3>Tell us the trip</h3><p>Destination, dates, group size and budget. Under a minute.</p></li>
-      <li><div class="n">2</div><h3>Get your preview</h3><p>See Day 1 of your plan free, then your full quote within 24 hours.</p></li>
-      <li><div class="n">3</div><h3>Go. Or we run it.</h3><p>Book it yourself with the blueprint, or hand us the whole trip.</p></li>
-    </ol>
+    <ul class="assure reveal" aria-label="Before you pay">
+      <li><b>See Day 1 free</b> before you pay for a custom plan</li>
+      <li><b>24 hours</b> from your details to your plan</li>
+      <li><b>1 free revision</b> included</li>
+      <li id="refund" hidden></li>
+    </ul>
   </div>
 </section>
 
@@ -774,33 +754,60 @@ dialog::backdrop{background:rgba(10,20,15,.68)}
   <div class="db" id="zm-box"></div>
 </dialog>
 
-<!-- ============ PRICING ============ -->
-<section id="services" aria-labelledby="services-h">
+<!-- ============ VERSUS ============ -->
+<section class="versus" id="how" aria-labelledby="how-h">
+  <svg class="edge" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70V30C220 64 420 8 660 34S1100 62 1440 24V70Z" fill="#EDE2CC"/></svg>
   <div class="wrap">
-    <div class="reveal"><span class="kicker">Ways to work with us</span><h2 id="services-h">Get exactly the help you need.</h2></div>
-    <div class="tickets">
-      <article class="tk reveal"><div>
-        <h3>Ready-Made Proven Blueprint</h3>
-        <div class="amt">Ready PDF<small>ONE-TIME PURCHASE</small></div>
-        <ul><li>PDF sent to your WhatsApp after payment: our tested Rajasthan and Kerala routes</li><li>Exact train/flight numbers, hotel area recommendations, food master list, packing checklist</li></ul>
-        <button class="btn btn-ghost btn-block" data-plan="blueprint">Buy Ready Blueprint</button></div></article>
-      <article class="tk pop reveal"><div>
-                <h3>Custom Day-by-Day Itinerary</h3>
-        <div class="amt">Built for you<small>SHAPED BY YOUR BUDGET</small></div>
-        <ul><li>Tailored to your exact dates, departure city, group size and budget</li><li>Time-stamped daily schedule, transit connections, custom ‘EAT’ food map, priority cut-list</li><li>Delivered in 24 hours + 1 free revision</li></ul>
-        <button class="btn btn-primary btn-block" data-plan="custom">Request Custom Plan</button></div></article>
-      <article class="tk reveal"><div>
-        <h3>Full Trip Execution / Group Package</h3>
-        <div class="amt">Custom Quote<small>50% ADVANCE</small></div>
-        <ul><li>Everything in the Custom Itinerary tier</li><li>Booking of stays and Tempo Travellers/cabs for your trip. Rajasthan and Kerala first; other destinations on request</li></ul>
-        <button class="btn btn-ghost btn-block" data-plan="complete">Get Group Package Quote</button></div></article>
+    <div class="reveal">
+      <span class="kicker">How it works</span>
+      <h2 id="how-h">Why our itineraries are different</h2>
+      <p class="lead">What a generic Google search or a cookie-cutter package leaves out.</p>
     </div>
-    <ul class="assure reveal" aria-label="Before you pay">
-      <li><b>See Day 1 free</b> before you pay for a custom plan</li>
-      <li><b>24 hours</b> from your details to your plan</li>
-      <li><b>1 free revision</b> included</li>
-      <li id="refund" hidden></li>
-    </ul>
+    <table class="vs reveal">
+      <thead><tr><th scope="col">The detail</th><th scope="col">Typical package</th><th scope="col">With us</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Hard deadlines &amp; cut-lists</th><td>“Fort visit” with no closing time or fallback.</td><td>Exact monument closing hours, highway buffers, and a cut-list if the group runs behind.</td></tr>
+        <tr><th scope="row">Curated ‘EAT’ food maps</th><td>Whatever restaurant the bus stops at.</td><td>Time-slotted local breakfast, street food and dinner, matched to your route.</td></tr>
+        <tr><th scope="row">Split-ready budgets</th><td>One lump sum, no breakdown.</td><td>Per-person costs for stays, Tempo Travellers, tickets and buffers, before you book anything.</td></tr>
+        <tr><th scope="row">Execution, when you want it</th><td>Take it or leave it.</td><td>Buy the PDF and book yourself, or we handle hotels and Tempo Travellers.</td></tr>
+      </tbody>
+    </table>
+    <div class="fit reveal">
+      <h3>Is this right for you?</h3>
+      <div class="fitcols">
+        <div><h4>A good fit if</h4><ul>
+          <li>You want a route that has been walked and timed, not a list of places</li>
+          <li>You're travelling solo, as a couple, with family or as a group, and want every day to run on schedule</li>
+          <li>You'd rather follow a planned route than build one from reviews</li></ul></div>
+        <div><h4>Probably not if</h4><ul>
+          <li>You want the cheapest hotel-and-bus bundle at a fixed price</li>
+          <li>You'd rather browse a catalogue and compare package deals</li>
+          <li>You don't want to follow a planned timetable</li></ul></div>
+      </div>
+      <p class="note">With the Blueprint and Custom Plan, we plan and you book. With Full Trip Execution, we book it too.</p>
+    </div>
+    <ol class="steps reveal">
+      <li><div class="n">1</div><h3>Tell us the trip</h3><p>Destination, dates, group size and budget. Under a minute.</p></li>
+      <li><div class="n">2</div><h3>Get your preview</h3><p>See Day 1 of your plan free, then your full quote within 24 hours.</p></li>
+      <li><div class="n">3</div><h3>Go. Or we run it.</h3><p>Book it yourself with the blueprint, or hand us the whole trip.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ FOUNDER ============ -->
+<section id="about" aria-labelledby="about-h">
+  <div class="wrap notes">
+    <div class="polas reveal" aria-hidden="false">
+      <figure class="pola a"><img src="img/trip-crew-560.webp" alt="A group of travellers standing with their motorbikes on a forest road" width="560" height="476" loading="lazy" decoding="async"><figcaption>The crew, mid-ride</figcaption></figure>
+      <figure class="pola b"><img src="img/trip-sunset-560.webp" alt="People silhouetted against the sea as the sun sets" width="560" height="476" loading="lazy" decoding="async"><figcaption>Sunset at the sea's edge</figcaption></figure>
+    </div>
+    <div class="reveal">
+      <span class="kicker">Field notes</span>
+      <h2 id="about-h">Trips fall apart on small things.</h2>
+      <p class="lead">Hi, I'm [FOUNDER_NAME]. I've planned group trips for 14 or more friends across Rajasthan, Goa, Karnataka, Kerala and the Konkan coast, and now I plan trips for other travellers across India. What ruins a trip is rarely the big stuff: it's the fort that shuts at 5, the train you can't miss, the lunch spot that takes 90 minutes.</p>
+      <p class="lead">So every plan here starts with those: exact timings, hard deadlines, and a cut-list for when the day runs late. No filler, no tourist traps, no guesswork.</p>
+      <p class="hand" style="margin-top:14px">&mdash; [FOUNDER_NAME], Pune</p>
+    </div>
   </div>
 </section>
 
@@ -987,6 +994,7 @@ const CFG = Object.assign({
   siteUrl: "",                       // your public address, used in the share-with-group message (defaults to this page)
   refundPolicy: "",                  // e.g. "Delivered within 48 hours, or refunded." Shown under the services only if you set it (decide the terms first)
   turnstileSiteKey: "",              // Cloudflare Turnstile site key (public). Empty = no bot check. Needs apiBase
+  departures: [],                    // real departures only (brand.json "departures"): the "Join a group trip" board stays hidden when this is empty
   reviews: []                        // real reviews only: [{ quote: "...", name: "Rohan K.", meta: "14-person Rajasthan trip · Pune" }]
 }, window.SITE_CONFIG || {});
 
@@ -1044,6 +1052,19 @@ $$(".reveal").forEach(r => io ? io.observe(r) : r.classList.add("in"));
       const c = document.createElement("figcaption"); c.textContent = r.name; const m = document.createElement("span"); m.textContent = r.meta || ""; c.append(m);
       f.append(q, c); return f; }));
     $("#proof").hidden = false; } }
+
+// group departures: shown only when real ones are supplied (SITE_CONFIG.departures, from brand.json); every number comes from that data
+{ const ds = Array.isArray(CFG.departures) ? CFG.departures.slice(0, 6) : [];
+  if (ds.length) {
+    const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+    $("#deps").replaceChildren(...ds.map(d => { const left = Math.max(0, d.seats_total - d.seats_booked); const card = el("article", "dep");
+      card.append(el("span", "when", d.dates), el("h3", "", d.route));
+      const bar = el("div", "seats"); const fill = el("i"); fill.style.width = Math.min(100, Math.round(100 * d.seats_booked / d.seats_total)) + "%"; bar.append(fill); bar.setAttribute("role", "img"); bar.setAttribute("aria-label", d.seats_booked + " of " + d.seats_total + " seats booked");
+      const dl = el("dl"); const row = (k, v) => { dl.append(el("dt", "", k), el("dd", "", v)); };
+      row("From", d.from); row("Seats", d.seats_booked + " of " + d.seats_total + " booked"); if (d.price_inr) row("Seat price", "₹" + Number(d.price_inr).toLocaleString("en-IN")); if (d.includes) row("Includes", d.includes); row("Go / no-go", d.go_no_go);
+      const btn = el("a", "btn btn-primary", left ? "Reserve a seat" : "Full: join the waitlist"); btn.href = waLink(`Hi! I'd like ${left ? "to reserve a seat" : "to join the waitlist"} on: ${d.route}, ${d.dates} (from ${d.from}).${srcLine() ? "\n" + srcLine() : ""}`); btn.target = "_blank"; btn.rel = "noopener"; btn.addEventListener("click", () => track("reserve_seat", { route: d.route }));
+      card.append(bar, dl, el("p", "rule", d.refund_rule), btn); return card; }));
+    $("#departures").hidden = false; } }
 
 // sample-day switcher (all illustrative; swap in real blueprint days when you have them)
 const DAYS = [

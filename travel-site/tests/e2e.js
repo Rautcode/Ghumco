@@ -168,6 +168,15 @@ const toPlanner = p => p.evaluate(() => document.querySelector('#planner').scrol
     await pg.addInitScript(() => { window.SITE_CONFIG = { apiBase: 'http://api.test' }; }); await pg.route('http://api.test/**', r => r.fulfill({ status: 500, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{}' })); await pg.goto(PAGE);
     await pg.evaluate(() => document.querySelector('[data-bp=kerala]').click()); await pg.fill('#dw-name', 'Asha'); await pg.fill('#dw-phone', '9876543210'); await pg.check('#dw-consent'); await pg.click('#dw-pay'); await pg.waitForTimeout(400);
     assert((await pg.getAttribute('#dw-status a', 'href')).startsWith('https://wa.me/'), 'checkout failure falls back to WhatsApp'); assert.equal(await pg.isDisabled('#dw-pay'), false); await pg.close(); }
+  // ---- group departures: hidden unless real ones are supplied; every number on the card comes from the data; the button opens a WhatsApp message
+  { const pg = await b.newPage({ viewport: { width: 1280, height: 900 } }); await pg.goto(PAGE); assert.equal(await pg.locator('#departures').isVisible(), false, 'no departures board without real departures'); assert.equal(await pg.locator('#deps .dep').count(), 0); await pg.close(); }
+  { const pg = await b.newPage({ viewport: { width: 1280, height: 900 } });
+    await pg.addInitScript(() => { window.SITE_CONFIG = { departures: [{ route: 'Test <b>route</b>', dates: '1-3 Jan', from: 'Pune', seats_total: 12, seats_booked: 7, go_no_go: 'Runs at 12+; decided 20 Dec', refund_rule: 'If it does not run you get a full refund.' }, { route: 'Full trip', dates: '5-7 Jan', from: 'Pune', seats_total: 8, seats_booked: 8, price_inr: 2500, go_no_go: 'Confirmed', refund_rule: 'Refund rules are in your written confirmation.' }] }; }); await pg.goto(PAGE);
+    assert.equal(await pg.locator('#departures').isVisible(), true); assert.equal(await pg.locator('#deps .dep').count(), 2);
+    const t = await pg.textContent('#deps .dep >> nth=0'); assert(t.includes('7 of 12 booked') && t.includes('Test <b>route</b>') && !/₹/.test(t), 'seat count shown, text is not HTML, no price when none is given'); assert.equal(await pg.locator('#deps b').count(), 0);
+    assert((await pg.textContent('#deps .dep >> nth=1')).includes('₹2,500'), 'a given price is shown'); assert.equal(await pg.textContent('#deps .dep >> nth=1 >> a.btn'), 'Full: join the waitlist');
+    const href = decodeURIComponent(await pg.getAttribute('#deps .dep >> nth=0 >> a.btn', 'href')); assert(href.startsWith('https://wa.me/') && href.includes('reserve a seat') && href.includes('1-3 Jan'), href);
+    assert.equal(await pg.getAttribute('#deps .seats >> nth=0', 'aria-label'), '7 of 12 seats booked'); await pg.close(); }
   // ---- Cloudflare Turnstile: opt-in, one single-use token per attempt, never blocks the WhatsApp fallback ----
   { const mode = async (key, how, drive) => { const calls = []; const pg = await b.newPage({ viewport: { width: 1280, height: 900 } }); let scriptHits = 0;
       await pg.addInitScript(k => { window.SITE_CONFIG = { apiBase: 'http://api.test', turnstileSiteKey: k }; }, key);
@@ -254,6 +263,7 @@ const toPlanner = p => p.evaluate(() => document.querySelector('#planner').scrol
     for (const f of pages) { const hits = fs.readFileSync(path.join(root, f), 'utf8').match(/₹\s?\d[\d,]*(?![\d,]*k)|\bRs\.?\s?\d|"price(?:Currency)?"\s*:|\bINR\b/g); assert(!hits, `${f} shows a price: ${hits}`); }
     assert(!fs.existsSync(path.join(root, 'fares.json')), 'the flight-fare data went with the prices');
     const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+    assert(!/class="strip"/.test(home), 'the repeated trust strip is gone');
     assert(!/<h1[^>]*>[^<]*Pune|Pune &amp; PCMC|<title>[^<]*Pune|group trip planner in Pune/i.test(home) && /<h1[^>]*>[^<]*India/.test(home) && /solo travellers, couples, families/i.test(home), 'home page positioning is India-wide for every kind of traveller, not Pune-only or group-only');
     assert(!/former tour guide|run them end to end|we have run group trips|rough estimate|weekend batches|verified stays|started out as a|years running|holding the flag|vetted local|vetted north|verified local|most popular|15 hours|local coordinator|100% ground-tested|hidden agency markups|500\+|80K\+|trusted by|travellers planned for|signature routes, walked/i.test(home), 'no claim we cannot back up yet');
     assert.deepEqual([...home.matchAll(/class="linkbtn" data-bp="([\w-]+)"/g)].map(m => m[1]), ['rajasthan', 'kerala'], 'a blueprint is offered only where a real plan exists');

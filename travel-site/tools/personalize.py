@@ -80,6 +80,29 @@ def load(path, allow_example):
         q, n, m = r.get("quote"), r.get("name"), r.get("meta", "")
         if not all(isinstance(x, str) for x in (q, n, m)) or not 10 <= len(q) <= 400 or not 2 <= len(n) <= 60 or len(m) > 80:
             die("each review needs a quote (10-400 characters), a name (2-60) and an optional meta line (up to 80)")
+    dp = b.get("departures", [])
+    if not isinstance(dp, list) or len(dp) > 6:
+        die("departures must be a list of at most 6 entries")
+    clean = []
+    for d in dp:
+        if not isinstance(d, dict) or d.get("confirmed") is not True:
+            die('every departure needs "confirmed": true. List a departure only when the vehicle, stays and trip leader are actually arranged.')
+        txt = {k: d.get(k) for k in ("route", "dates", "from", "go_no_go", "refund_rule")}
+        if not all(isinstance(v, str) and v.strip() for v in txt.values()) or len(txt["route"]) > 80 or len(txt["dates"]) > 40 or len(txt["from"]) > 60 or len(txt["go_no_go"]) > 120:
+            die("each departure needs route (up to 80 characters), dates (40), from (60), go_no_go (120) and refund_rule")
+        if len(txt["refund_rule"].strip()) < 25 or len(txt["refund_rule"]) > 300:
+            die("refund_rule must say, in 25-300 characters, what happens if the trip does not run or the traveller cancels (it is shown on the card)")
+        st, sb = d.get("seats_total"), d.get("seats_booked")
+        if not (isinstance(st, int) and isinstance(sb, int) and not isinstance(st, bool) and not isinstance(sb, bool) and 2 <= st <= 60 and 0 <= sb <= st):
+            die("seats_total must be a whole number from 2 to 60 and seats_booked a whole number from 0 to seats_total (real counts only)")
+        pr = d.get("price_inr")
+        if pr is not None and not (isinstance(pr, int) and not isinstance(pr, bool) and 1 <= pr <= 1_000_000):
+            die("price_inr, if given, must be a whole number of rupees per seat (or leave it out and the card shows no price)")
+        inc = d.get("includes", "")
+        if not isinstance(inc, str) or len(inc) > 160:
+            die("includes must be text of up to 160 characters")
+        clean.append({**{k: v.strip() for k, v in txt.items()}, "seats_total": st, "seats_booked": sb, **({"price_inr": pr} if pr else {}), **({"includes": inc.strip()} if inc.strip() else {})})
+    b["departures"] = clean
     b["reviews"] = [{"quote": r["quote"], "name": r["name"], "meta": r.get("meta", "")} for r in rv]
     return b
 
@@ -106,6 +129,8 @@ def fill(text, b):
     text = text.replace("[TURNSTILE_NOTE]", tnote) if b["turnstile_site_key"] else re.sub(r"\s*<li>\[TURNSTILE_NOTE\]</li>", "", text)
     if b["turnstile_site_key"]:
         text = text.replace('turnstileSiteKey: "",', f'turnstileSiteKey: "{b["turnstile_site_key"]}",')
+    if b["departures"]:
+        text = text.replace("departures: [],", "departures: " + json.dumps(b["departures"], ensure_ascii=False).replace("<", "\\u003c") + ",", 1)
     if b["reviews"]:
         text = text.replace("reviews: []", "reviews: " + json.dumps(b["reviews"], ensure_ascii=False).replace("<", "\\u003c"))
     return text
@@ -184,6 +209,8 @@ def main():
                 die('api_base was not applied: index.html no longer contains \'apiBase: "",\' (update personalize.py to match)')
             if name == "index.html" and b["turnstile_site_key"] and f'turnstileSiteKey: "{b["turnstile_site_key"]}"' not in text:
                 die('turnstile_site_key was not applied: index.html no longer contains \'turnstileSiteKey: "",\' (update personalize.py to match)')
+            if name == "index.html" and b["departures"] and "departures: [{" not in text:
+                die('departures were not applied: index.html no longer contains "departures: [],"')
             if name == "index.html" and b["reviews"] and "reviews: [{" not in text:
                 die('reviews were not applied: index.html no longer contains "reviews: []" (update personalize.py to match)')
             if src.suffix == ".html" and b["analytics_token"]:
