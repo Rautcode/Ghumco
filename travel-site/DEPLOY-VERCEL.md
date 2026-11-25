@@ -14,7 +14,7 @@ Check Vercel's current terms and pricing before you pick a plan.
    Leave `api_base` empty for now (WhatsApp-only mode).
 2. **Turn it into one line:** `node tools/brand_env.js brand.json` prints your brand JSON on a single line. Copy it. It contains only public site details (no secrets).
 3. **Import the repo in Vercel:** Add New > Project > pick `Rautcode/Ghumco`.
-   - **Root Directory:** `travel-site`
+   - **Root Directory:** leave it as the repo root (the root `vercel.json` builds `travel-site/`), or set `travel-site` (its own `vercel.json` also works). If the deployed page says "This page doesn't exist", the build did not run: open the build log.
    - **Framework Preset:** Other (Vercel reads `vercel.json`; leave Build Command, Install Command and Output Directory as they are, and do not set an Output Directory)
    - **Environment Variables:** name `BRAND_JSON`, value the one line from step 2, for Production **and** Preview.
 4. **Production branch:** Settings > Git > Production Branch. Use `main` once the work is merged, or the branch `claude/busy-hopper-1405z8` until then.
