@@ -15,15 +15,18 @@ _env = Environment(
 _sem = asyncio.Semaphore(2)  # WeasyPrint is CPU/RAM heavy; bound concurrency
 
 
-def _deny_fetch(url, *_, **__):
-    # SSRF/exfil guard: the template needs no network or file access. Block everything.
-    raise ValueError(f"blocked fetch: {url[:60]}")
+def _fetcher():
+    # SSRF/exfil guard: the template needs no network or file access, so the allow-list of URL schemes is empty and every fetch is refused.
+    # WeasyPrint 70+ takes a fetcher object (an older plain function is rejected).
+    from weasyprint.urls import URLFetcher
+
+    return URLFetcher(allowed_protocols=())
 
 
 def _render_sync(html: str) -> bytes:
     from weasyprint import HTML  # lazy: import fails loudly in self_check() if Pango is missing
 
-    return HTML(string=html, url_fetcher=_deny_fetch).write_pdf()
+    return HTML(string=html, url_fetcher=_fetcher()).write_pdf()
 
 
 async def render_pdf(itin: ItineraryJSON, lead: dict, preview: bool) -> bytes:
