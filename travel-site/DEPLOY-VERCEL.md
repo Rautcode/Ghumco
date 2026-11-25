@@ -38,3 +38,6 @@ To roll back, open Deployments and promote an earlier one.
 
 ## What this does not cover
 Vercel hosts only the website. The API (leads, previews, payments, WhatsApp webhook) is a separate service: see `travel-backend/README.md`. Until you set `api_base`, the planner sends every enquiry to your WhatsApp.
+
+## If a deployment fails
+Open the deployment, then its Build Logs. The last red line names the problem. The most common: `BRAND_JSON` missing or still holding placeholders (`91XXXXXXXXXX`), or `legal_reviewed` still `false`. Environment variables apply only to new builds, so Redeploy after editing them.
