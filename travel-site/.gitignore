@@ -1,0 +1,8 @@
+node_modules/
+brand.json
+dist/
+dist-preview/
+brand/kit.json
+brand/out/
+brand/templates/.tmp-*
+.vercel/

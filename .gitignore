@@ -1,0 +1,18 @@
+# secrets and private details: never commit these
+.env
+*.env
+travel-site/brand.json
+travel-site/brand/kit.json
+# generated or installed
+node_modules/
+dist/
+dist-preview/
+.vercel/
+travel-site/brand/out/
+travel-site/brand/templates/.tmp-*
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
